@@ -17,6 +17,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -51,15 +52,19 @@ public class DigilockerAPIs {
 
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	AddressRepository addressRepo;
-	
+
 	@Autowired
 	RoleRepository roleRepository;
-	
-	private String CLIENT_SECRET = "D1b41jaxUcGkNZRyVjB0";
-	private String CLIENT_ID = "VTDRIDOX";
+
+	@Value("${edigiseva.app.clientsecret}")
+	private String CLIENT_SECRET;
+
+	@Value("${edigiseva.app.clientid}")
+	private String CLIENT_ID;
+
 	@PostMapping("/getdocument")
 	public @ResponseBody String getDocumentList(@RequestBody String token) throws URISyntaxException {
 		RestTemplate restTemplate = new RestTemplate();
@@ -67,6 +72,9 @@ public class DigilockerAPIs {
 		JSONObject reqObject = new JSONObject(token);
 		String tok = reqObject.getString("token");
 		String udi = reqObject.getString("udid");
+		String mobileNo = reqObject.getString("mobileNo");
+		String email = reqObject.getString("email");
+		String password = reqObject.getString("password");
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", "Bearer " + tok);
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -79,11 +87,11 @@ public class DigilockerAPIs {
 		for (int i = 0; i < items.length(); i++) {
 			uri = (String) new JSONObject(items.get(i).toString()).get("uri");
 		}
-		getPdfFile(uri, tok);
+		getPdfFile(uri, tok, udi, mobileNo, email, password);
 		return resObject.toString();
 	}
 
-	private void getPdfFile(String uri, String tok) {
+	private void getPdfFile(String uri, String tok, String udi, String mobileNo, String email, String password) {
 		RestTemplate restTemplate = new RestTemplate();
 		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/file/" + uri;
 		HttpHeaders headers = new HttpHeaders();
@@ -107,43 +115,44 @@ public class DigilockerAPIs {
 			Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
 					.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
 			roles.add(userRole);
-			List<Address> addrList = new ArrayList<>();
-			addrList.add(res);
-			Users saveUser = new Users(new BigDecimal(user.getUid()), user.getName(), "jenis.6591@gmail.com", new BigDecimal("1234567890"), user.getGender(), new SimpleDateFormat("dd-MM-yyyy").parse(user.getDateOfBirth()),"test@123", addrList, roles);
+			
+			Users saveUser = new Users(new BigDecimal(user.getUid()), user.getName(), email,
+					new BigDecimal(mobileNo), user.getGender(),
+					new SimpleDateFormat("dd-MM-yyyy").parse(user.getDateOfBirth()), password, res, roles);
 			userRepository.save(saveUser);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	@GetMapping("/digilockerauth")
-	private  ResponseEntity<?> getDigiLocaker() throws URISyntaxException {
+	private ResponseEntity<?> getDigiLocaker() throws URISyntaxException {
 
 		final String baseUrl = "https://developers.digitallocker.gov.in/public/oauth2/1/authorize?response_type=token&client_id=VTDRIDOX&state=gujarat&redirect_uri=https://www.google.com";
 
 		RestTemplate restTemplate = new RestTemplate();
 		URI uri = new URI(baseUrl);
 		HttpHeaders headers = new HttpHeaders();
-        Charset utf8 = Charset.forName("UTF-8");
-        MediaType mediaType = new MediaType("text", "html", utf8);
-        headers.setContentType(mediaType);
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-        HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
-        List<HttpMessageConverter<?>> httpMessageConverter = Lists.newArrayList();
-        httpMessageConverter.add(stringHttpMessageConverter);
-        restTemplate.setMessageConverters(httpMessageConverter);
+		Charset utf8 = Charset.forName("UTF-8");
+		MediaType mediaType = new MediaType("text", "html", utf8);
+		headers.setContentType(mediaType);
+		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+		HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+		List<HttpMessageConverter<?>> httpMessageConverter = Lists.newArrayList();
+		httpMessageConverter.add(stringHttpMessageConverter);
+		restTemplate.setMessageConverters(httpMessageConverter);
 		ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-		System.out.println("Result  "+responseEntity.getBody());
+		System.out.println("Result  " + responseEntity.getBody());
 		return responseEntity;
 	}
-	
+
 	@GetMapping("/getlistofissuer")
 	public @ResponseBody String getListOfIssuer() throws URISyntaxException {
 		RestTemplate restTemplate = new RestTemplate();
 		long ts = new Timestamp(System.currentTimeMillis()).getTime();
-		String hmac = Utilities.stringToSh556(CLIENT_SECRET+CLIENT_ID+ts);
-		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/pull/issuers?"+"clientid="+CLIENT_ID+"&ts="+ts
-				+"&hmac="+hmac;
+		String hmac = Utilities.stringToSh556(CLIENT_SECRET + CLIENT_ID + ts);
+		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/pull/issuers?" + "clientid=" + CLIENT_ID
+				+ "&ts=" + ts + "&hmac=" + hmac;
 		ResponseEntity<String> result = restTemplate.getForEntity(URL, String.class);
 		return result.getBody();
 	}

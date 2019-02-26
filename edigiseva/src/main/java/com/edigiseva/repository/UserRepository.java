@@ -11,6 +11,6 @@ import com.edigiseva.model.Users;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long> {
-    Boolean existsByEmail(String email);
-    Optional<Users> findByUuid(BigDecimal uuid);
+   // Boolean existsByEmail(String email);
+    //Optional<Users> findByUuid(BigDecimal uuid);
 }

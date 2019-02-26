@@ -1,12 +1,11 @@
 package com.edigiseva.model;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,23 +13,23 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+
 
 @Entity
-@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })
+@Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })
 public class Users{
 
 	@Id
 	@GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+	@Column(name = "user_id")
 	private Long id;
 	@NotNull
 	private BigDecimal uuid;
@@ -57,10 +56,10 @@ public class Users{
 	@Size(min=6, max = 100) 
 	private String password;
 	
-	@OneToMany(fetch = FetchType.LAZY)
-	@Cascade(value=CascadeType.ALL)
-	@JoinTable(name = "address", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "address_id"))
-	private List<Address> address;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="address_id")
+	private Address address;
 	
 	
 	@OneToMany(fetch = FetchType.LAZY)
@@ -137,13 +136,12 @@ public class Users{
 		this.password = password;
 	}
 
-
-	public List<Address> getAddress() {
+	public Address getAddress() {
 		return address;
 	}
 
 
-	public void setAddress(List<Address> address) {
+	public void setAddress(Address address) {
 		this.address = address;
 	}
 
@@ -166,7 +164,7 @@ public class Users{
 	public Users(@NotBlank @Size(max = 10) BigDecimal uuid, @NotBlank @Size(max = 50) String name,
 			@NotBlank @Size(max = 100) String email, @NotBlank @Size(max = 12) BigDecimal mobileNo,
 			@NotBlank @Size(max = 6) String gender, @NotBlank Date dob,
-			@NotBlank @Size(min = 6, max = 100) String password, @NotBlank List<Address> address, Set<Role> roles) {
+			@NotBlank @Size(min = 6, max = 100) String password, Address address, Set<Role> roles) {
 		super();
 		this.uuid = uuid;
 		this.name = name;

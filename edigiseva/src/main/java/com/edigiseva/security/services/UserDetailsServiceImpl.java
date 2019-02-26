@@ -20,9 +20,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetails loadUserByUuid(BigDecimal uuid) throws UsernameNotFoundException {
 
 		
-		Users user = userRepository.findByUuid(uuid)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with -> Adhaar or email : " + uuid));
-		return UserPrinciple.build(user);
+		/*
+		 * Users user = userRepository.findByUuid(uuid) .orElseThrow(() -> new
+		 * UsernameNotFoundException("User Not Found with -> Adhaar or email : " +
+		 * uuid)); return UserPrinciple.build(user);
+		 */
+		return null;
 		 
 	}
 

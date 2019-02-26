@@ -63,9 +63,11 @@ public class AuthRestAPIs {
 
 	@PostMapping("/signup")
 	public ResponseEntity<String> registerUser(@Valid @RequestBody Users signUpRequest) {
-		if (userRepository.findByUuid(signUpRequest.getUuid()).isPresent()) {
-			return new ResponseEntity<String>("Fail -> Adhar is already exist!", HttpStatus.BAD_REQUEST);
-		}
+		/*
+		 * if (userRepository.findByUuid(signUpRequest.getUuid()).isPresent()) { return
+		 * new ResponseEntity<String>("Fail -> Adhar is already exist!",
+		 * HttpStatus.BAD_REQUEST); }
+		 */
 
 		// Creating user's account
 		Users user = new Users(signUpRequest.getUuid(), signUpRequest.getName(), signUpRequest.getEmail(),

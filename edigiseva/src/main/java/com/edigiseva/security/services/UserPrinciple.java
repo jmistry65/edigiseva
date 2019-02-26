@@ -29,11 +29,11 @@ public class UserPrinciple implements UserDetails {
 	private BigDecimal mobileNo;
 	private String gender;
 	private Date dob;
-	private List<Address> address;
+	private Address address;
 
 
     public UserPrinciple(BigDecimal uuid, String name, String email, BigDecimal mobileNo, String gender,
-			Date dob, String password, List<Address> address, List<GrantedAuthority> authorities) {
+			Date dob, String password, Address address, List<GrantedAuthority> authorities) {
     	this.uuid = uuid;
 		this.name = name;
 		this.email = email;
@@ -144,11 +144,11 @@ public class UserPrinciple implements UserDetails {
 	}
 
 
-	public List<Address> getAddress() {
+	public Address getAddress() {
 		return address;
 	}
 
-	public void setAddress(List<Address> address) {
+	public void setAddress(Address address) {
 		this.address = address;
 	}
 
