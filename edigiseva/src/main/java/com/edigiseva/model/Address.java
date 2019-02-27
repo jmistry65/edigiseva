@@ -1,10 +1,8 @@
 package com.edigiseva.model;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -23,16 +21,9 @@ public class Address {
 	private String state;
 	private Integer pincode;
 
-	/*
-	 * @OneToOne(fetch = FetchType.LAZY, mappedBy = "address")
-	 * 
-	 * @Cascade(value=CascadeType.ALL)
-	 * 
-	 * @JoinColumn(name = "user_id")
-	 */
+	
 	@OneToOne
 	private Users user;
-
 	public String getHouseNo() {
 		return houseNo;
 	}

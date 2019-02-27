@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -24,15 +21,14 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })
 public class Users {
-
+	
 	@Id
-
 	@SequenceGenerator(name = "user_id_seq_generator", sequenceName = "user_id_seq", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq_generator")
 	private Long id;
-
+	
 	@NotNull
 	private BigDecimal uuid;
 
@@ -57,21 +53,12 @@ public class Users {
 	@NotBlank
 	@Size(min = 6, max = 100)
 	private String password;
-
-	/*
-	 * @OneToOne(cascade = CascadeType.ALL)
-	 * 
-	 * @JoinColumn(name="address_id")
-	 */
-	/*
-	 * @OneToOne(cascade = CascadeType.ALL)
-	 * 
-	 * @JoinColumn(name="address_id") private Address address;
-	 */
-
+	
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+	
+	private String username;
 
 	public BigDecimal getUuid() {
 		return uuid;
@@ -129,13 +116,6 @@ public class Users {
 		this.password = password;
 	}
 
-	/*
-	 * public Address getAddress() { return address; }
-	 * 
-	 * 
-	 * public void setAddress(Address address) { this.address = address; }
-	 * 
-	 */
 	public Set<Role> getRoles() {
 		return roles;
 	}
@@ -148,18 +128,10 @@ public class Users {
 		super();
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Users(@NotBlank @Size(max = 10) BigDecimal uuid, @NotBlank @Size(max = 50) String name,
-			@NotBlank @Size(max = 100) String email, @NotBlank @Size(max = 12) BigDecimal mobileNo,
-			@NotBlank @Size(max = 6) String gender, @NotBlank Date dob,
-			@NotBlank @Size(min = 6, max = 100) String password, /* Address address, */ Set<Role> roles) {
+	public Users( @NotNull BigDecimal uuid, @NotBlank @Size(max = 50) String name,
+			@NotBlank @Size(max = 100) String email, @NotNull BigDecimal mobileNo,
+			@NotBlank @Size(max = 6) String gender, @NotNull Date dob,
+			@NotBlank @Size(min = 6, max = 100) String password, Set<Role> roles) {
 		super();
 		this.uuid = uuid;
 		this.name = name;
@@ -168,8 +140,8 @@ public class Users {
 		this.gender = gender;
 		this.dob = dob;
 		this.password = password;
-		// this.address = address;
 		this.roles = roles;
 	}
 
+	
 }

@@ -60,42 +60,4 @@ public class AuthRestAPIs {
 		String jwt = jwtProvider.generateJwtToken(authentication);
 		return ResponseEntity.ok(new JwtResponse(jwt));
 	}
-
-	@PostMapping("/signup")
-	public ResponseEntity<String> registerUser(@Valid @RequestBody Users signUpRequest) {
-		/*
-		 * if (userRepository.findByUuid(signUpRequest.getUuid()).isPresent()) { return
-		 * new ResponseEntity<String>("Fail -> Adhar is already exist!",
-		 * HttpStatus.BAD_REQUEST); }
-		 */
-
-		// Creating user's account
-		Users user = new Users(signUpRequest.getUuid(), signUpRequest.getName(), signUpRequest.getEmail(),
-				signUpRequest.getMobileNo(), signUpRequest.getGender(), signUpRequest.getDob(),
-				signUpRequest.getPassword(), /* signUpRequest.getAddress(), */ signUpRequest.getRoles());
-
-	//	user.setAddress(signUpRequest.getAddress());
-		Set<Role> strRoles = signUpRequest.getRoles();
-		Set<Role> roles = new HashSet<>();
-
-		strRoles.forEach(role -> {
-			switch (role.toString()) {
-			case "admin":
-				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(adminRole);
-				break;
-			default:
-				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(userRole);
-			}
-		});
-
-		user.setRoles(roles);
-		userRepository.save(user);
-
-		return ResponseEntity.ok().body("User registered successfully!");
-	}
-
 }

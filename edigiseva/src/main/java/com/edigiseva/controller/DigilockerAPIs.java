@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -64,16 +65,31 @@ public class DigilockerAPIs {
 	@Value("${edigiseva.app.clientid}")
 	private String CLIENT_ID;
 
-	@PostMapping("/getdocument")
-	public @ResponseBody String getDocumentList(@RequestBody String token) throws URISyntaxException {
-		RestTemplate restTemplate = new RestTemplate();
-		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/files/issued";
-		JSONObject reqObject = new JSONObject(token);
+	@PostMapping("/signup")
+	public @ResponseBody ResponseEntity<String> getDocumentList(@RequestBody String signupRequest) throws URISyntaxException {
+		 
+		
+		JSONObject reqObject = new JSONObject(signupRequest);
 		String tok = reqObject.getString("token");
-		String udi = reqObject.getString("udid");
-		String mobileNo = reqObject.getString("mobileNo");
+		BigDecimal udid = reqObject.getBigDecimal("udid");
+		BigDecimal mobileNo = reqObject.getBigDecimal("mobileNo");
 		String email = reqObject.getString("email");
 		String password = reqObject.getString("password");
+		if (userRepository.findByUuid(udid).isPresent()) { 
+			return new ResponseEntity<String>("Fail -> Adhar is already exist!",
+				  HttpStatus.BAD_REQUEST); 
+		}
+		if (userRepository.findByMobileNo(mobileNo).isPresent()) { 
+			return new ResponseEntity<String>("Fail -> Mobile No is already exist!",
+				  HttpStatus.BAD_REQUEST); 
+		}
+		if (userRepository.findByEmail(email).isPresent()) { 
+			return new ResponseEntity<String>("Fail -> Email is already exist!",
+				  HttpStatus.BAD_REQUEST); 
+		}
+		
+		RestTemplate restTemplate = new RestTemplate();
+		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/files/issued";
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", "Bearer " + tok);
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -86,11 +102,11 @@ public class DigilockerAPIs {
 		for (int i = 0; i < items.length(); i++) {
 			uri = (String) new JSONObject(items.get(i).toString()).get("uri");
 		}
-		getPdfFile(uri, tok, udi, mobileNo, email, password);
-		return resObject.toString();
+		getPdfFile(uri, tok, udid, mobileNo, email, password);
+		return new ResponseEntity<String>("User Created", HttpStatus.OK);
 	}
 
-	private void getPdfFile(String uri, String tok, String udi, String mobileNo, String email, String password) {
+	private void getPdfFile(String uri, String tok, BigDecimal udid, BigDecimal mobileNo, String email, String password) {
 		RestTemplate restTemplate = new RestTemplate();
 		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/file/" + uri;
 		HttpHeaders headers = new HttpHeaders();
@@ -108,8 +124,8 @@ public class DigilockerAPIs {
 					.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
 			roles.add(userRole);
 			
-			Users saveUser = new Users(new BigDecimal(udi), user.getName(), email,
-					new BigDecimal(mobileNo), user.getGender(),
+			Users saveUser = new Users(udid, user.getName(), email,
+					mobileNo, user.getGender(),
 					new SimpleDateFormat("dd-MM-yyyy").parse(user.getDateOfBirth()), password,  roles);
 			Address addr = new Address();
 			addr.setHouseNo(user.getBuilding());
@@ -119,13 +135,9 @@ public class DigilockerAPIs {
 			addr.setPincode(Integer.parseInt(user.getPincode()));
 			addr.setState(user.getStateName());
 			
-			
 			Users u = userRepository.save(saveUser);
 			addr.setUser(u);
-			Address res = addressRepo.save(addr);
-			/*
-			 * u.setAddress(res); userRepository.save(u);
-			 */
+			addressRepo.save(addr);
 			
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();

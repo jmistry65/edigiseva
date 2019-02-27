@@ -40,7 +40,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
             if (jwt!=null && tokenProvider.validateJwtToken(jwt)) {
                 BigDecimal uuid = (new BigDecimal(tokenProvider.getUserNameFromJwtToken(jwt)));
 
-                UserDetails userDetails = userDetailsService.loadUserByUuid(uuid);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(uuid.toString());
                 UsernamePasswordAuthenticationToken authentication 
                 		= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

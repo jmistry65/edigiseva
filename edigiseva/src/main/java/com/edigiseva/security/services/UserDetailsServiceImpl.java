@@ -17,21 +17,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	UserRepository userRepository;
 
-	public UserDetails loadUserByUuid(BigDecimal uuid) throws UsernameNotFoundException {
-
-		
-		/*
-		 * Users user = userRepository.findByUuid(uuid) .orElseThrow(() -> new
-		 * UsernameNotFoundException("User Not Found with -> Adhaar or email : " +
-		 * uuid)); return UserPrinciple.build(user);
-		 */
-		return null;
-		 
-	}
-
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
 }
