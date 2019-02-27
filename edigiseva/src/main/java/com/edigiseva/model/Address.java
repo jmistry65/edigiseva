@@ -1,8 +1,10 @@
 package com.edigiseva.model;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -28,7 +30,7 @@ public class Address {
 	 * 
 	 * @JoinColumn(name = "user_id")
 	 */
-	@OneToOne(mappedBy = "user_id")
+	@OneToOne
 	private Users user;
 
 	public String getHouseNo() {
@@ -79,4 +81,12 @@ public class Address {
 		this.pincode = pincode;
 	}
 
+	public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
+	}
+	
 }

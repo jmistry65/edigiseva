@@ -33,7 +33,7 @@ public class UserPrinciple implements UserDetails {
 
 
     public UserPrinciple(BigDecimal uuid, String name, String email, BigDecimal mobileNo, String gender,
-			Date dob, String password, Address address, List<GrantedAuthority> authorities) {
+			Date dob, String password, /* Address address, */ List<GrantedAuthority> authorities) {
     	this.uuid = uuid;
 		this.name = name;
 		this.email = email;
@@ -41,7 +41,7 @@ public class UserPrinciple implements UserDetails {
 		this.gender = gender;
 		this.dob = dob;
 		this.password = password;
-		this.address = address;
+	//	this.address = address;
 		this.authorities = authorities;
 	}
 
@@ -58,7 +58,7 @@ public class UserPrinciple implements UserDetails {
         		user.getGender(),
         		user.getDob(),
         		user.getPassword(),
-        		user.getAddress(),
+        		//user.getAddress(),
                 authorities
         );
     }

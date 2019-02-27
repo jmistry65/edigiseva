@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -103,6 +102,15 @@ public class DigilockerAPIs {
 			Utilities.writePdfFile(response);
 			String jsonObjetct = Utilities.xmlToJson(UserJson.class);
 			UserJson user = (UserJson) Utilities.jsonToObject(jsonObjetct, UserJson.class);
+		
+			Set<Role> roles = new HashSet<>();
+			Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+					.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+			roles.add(userRole);
+			
+			Users saveUser = new Users(new BigDecimal(udi), user.getName(), email,
+					new BigDecimal(mobileNo), user.getGender(),
+					new SimpleDateFormat("dd-MM-yyyy").parse(user.getDateOfBirth()), password,  roles);
 			Address addr = new Address();
 			addr.setHouseNo(user.getBuilding());
 			addr.setAddress1(user.getStreet());
@@ -110,16 +118,15 @@ public class DigilockerAPIs {
 			addr.setCity(user.getVtcName());
 			addr.setPincode(Integer.parseInt(user.getPincode()));
 			addr.setState(user.getStateName());
-			Address res = addressRepo.save(addr);
-			Set<Role> roles = new HashSet<>();
-			Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-					.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-			roles.add(userRole);
 			
-			Users saveUser = new Users(new BigDecimal(user.getUid()), user.getName(), email,
-					new BigDecimal(mobileNo), user.getGender(),
-					new SimpleDateFormat("dd-MM-yyyy").parse(user.getDateOfBirth()), password, res, roles);
-			userRepository.save(saveUser);
+			
+			Users u = userRepository.save(saveUser);
+			addr.setUser(u);
+			Address res = addressRepo.save(addr);
+			/*
+			 * u.setAddress(res); userRepository.save(u);
+			 */
+			
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
