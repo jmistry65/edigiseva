@@ -34,6 +34,18 @@ public class JwtProvider {
 		                .compact();
     }
     
+    public String generateJwtToken(String username) {
+
+      //  UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
+
+        return Jwts.builder()
+		                .setSubject((username))
+		                .setIssuedAt(new Date())
+		                .setExpiration(new Date((new Date()).getTime() + jwtExpiration*1000))
+		                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+		                .compact();
+    }
+    
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);

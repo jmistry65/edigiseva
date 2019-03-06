@@ -1,7 +1,10 @@
 package com.edigiseva.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -11,8 +14,12 @@ import javax.persistence.Table;
 public class Address {
 
 	@Id
-	@GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
+	private boolean isActive = true;
+	private Timestamp created = new Timestamp(System.currentTimeMillis());
+	private Timestamp updated = new Timestamp(System.currentTimeMillis());
+	
 
 	private String houseNo;
 	private String Address1;
@@ -78,6 +85,30 @@ public class Address {
 
 	public void setUser(Users user) {
 		this.user = user;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public Timestamp getCreated() {
+		return created;
+	}
+
+	public void setCreated(Timestamp created) {
+		this.created = created;
+	}
+
+	public Timestamp getUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(Timestamp updated) {
+		this.updated = updated;
 	}
 	
 }

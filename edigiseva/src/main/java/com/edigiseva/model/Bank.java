@@ -1,28 +1,37 @@
 package com.edigiseva.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "bank")
-public class Bank {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Bank{
 
 	@Id
-	@GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
-
-	@OneToOne
-	@JoinColumn(name = "user_id", nullable = false)
+	private boolean isActive = true;
+	private Timestamp created = new Timestamp(System.currentTimeMillis());
+	private Timestamp updated = new Timestamp(System.currentTimeMillis());
+	
+	@ManyToOne
+	@JsonIgnore
 	private Users user;
 	
 	private String bankName;
 	private String ifsc;
 	private String branchname;
-	private String accountNo;
+	private Long accountNo;
 	public Users getUser() {
 		return user;
 	}
@@ -47,10 +56,29 @@ public class Bank {
 	public void setBranchname(String branchname) {
 		this.branchname = branchname;
 	}
-	public String getAccountNo() {
+	public Long getAccountNo() {
 		return accountNo;
 	}
-	public void setAccountNo(String accountNo) {
+	public void setAccountNo(Long accountNo) {
 		this.accountNo = accountNo;
 	}
+	public boolean isActive() {
+		return isActive;
+	}
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+	public Timestamp getCreated() {
+		return created;
+	}
+	public void setCreated(Timestamp created) {
+		this.created = created;
+	}
+	public Timestamp getUpdated() {
+		return updated;
+	}
+	public void setUpdated(Timestamp updated) {
+		this.updated = updated;
+	}
+	
 }

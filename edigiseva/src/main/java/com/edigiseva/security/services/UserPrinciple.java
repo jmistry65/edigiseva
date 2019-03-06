@@ -1,11 +1,13 @@
 package com.edigiseva.security.services;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.edigiseva.model.Address;
 import com.edigiseva.model.Users;
+import com.edigiseva.utils.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserPrinciple implements UserDetails {
@@ -25,14 +28,15 @@ public class UserPrinciple implements UserDetails {
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-	private BigDecimal uuid;
-	private BigDecimal mobileNo;
-	private String gender;
+	private Long uuid;
+	private Long mobileNo;
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
 	private Date dob;
 	private Address address;
 
 
-    public UserPrinciple(BigDecimal uuid, String name, String email, BigDecimal mobileNo, String gender,
+    public UserPrinciple(Long uuid, String name, String email, Long mobileNo, Gender gender,
 			Date dob, String password,List<GrantedAuthority> authorities) {
     	this.uuid = uuid;
 		this.name = name;
@@ -109,19 +113,19 @@ public class UserPrinciple implements UserDetails {
     }
 
     
-    public BigDecimal getUuid() {
+    public Long getUuid() {
 		return uuid;
 	}
 
-	public void setUuid(BigDecimal uuid) {
+	public void setUuid(Long uuid) {
 		this.uuid = uuid;
 	}
 
-	public String getGender() {
+	public Gender getGender() {
 		return gender;
 	}
 
-	public void setGender(String gender) {
+	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
 
@@ -133,11 +137,11 @@ public class UserPrinciple implements UserDetails {
 		this.dob = dob;
 	}
 
-	public BigDecimal getMobileNo() {
+	public Long getMobileNo() {
 		return mobileNo;
 	}
 
-	public void setMobileNo(BigDecimal mobileNo) {
+	public void setMobileNo(Long mobileNo) {
 		this.mobileNo = mobileNo;
 	}
 

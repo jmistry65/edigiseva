@@ -7,11 +7,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,14 +31,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.edigiseva.model.Address;
-import com.edigiseva.model.Role;
-import com.edigiseva.model.RoleName;
+import com.edigiseva.message.response.DigiSevaResponseEntity;
 import com.edigiseva.model.UserJson;
-import com.edigiseva.model.Users;
-import com.edigiseva.repository.AddressRepository;
-import com.edigiseva.repository.RoleRepository;
-import com.edigiseva.repository.UserRepository;
+import com.edigiseva.service.UserService;
 import com.edigiseva.utils.Utilities;
 import com.google.common.collect.Lists;
 
@@ -50,14 +42,9 @@ import com.google.common.collect.Lists;
 @RequestMapping("/api/auth/digilocker")
 public class DigilockerAPIs {
 
+		
 	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	AddressRepository addressRepo;
-
-	@Autowired
-	RoleRepository roleRepository;
+	private UserService userService;
 
 	@Value("${edigiseva.app.clientsecret}")
 	private String CLIENT_SECRET;
@@ -66,27 +53,15 @@ public class DigilockerAPIs {
 	private String CLIENT_ID;
 
 	@PostMapping("/signup")
-	public @ResponseBody ResponseEntity<String> getDocumentList(@RequestBody String signupRequest) throws URISyntaxException {
-		 
-		
+	public @ResponseBody ResponseEntity<DigiSevaResponseEntity> getDocumentList(@RequestBody String signupRequest)
+			throws URISyntaxException {
+
 		JSONObject reqObject = new JSONObject(signupRequest);
 		String tok = reqObject.getString("token");
-		BigDecimal udid = reqObject.getBigDecimal("udid");
-		BigDecimal mobileNo = reqObject.getBigDecimal("mobileNo");
+		Long udid = reqObject.getLong("udid");
+		Long mobileNo = reqObject.getLong("mobileNo");
 		String email = reqObject.getString("email");
 		String password = reqObject.getString("password");
-		if (userRepository.findByUuid(udid).isPresent()) { 
-			return new ResponseEntity<String>("Fail -> Adhar is already exist!",
-				  HttpStatus.BAD_REQUEST); 
-		}
-		if (userRepository.findByMobileNo(mobileNo).isPresent()) { 
-			return new ResponseEntity<String>("Fail -> Mobile No is already exist!",
-				  HttpStatus.BAD_REQUEST); 
-		}
-		if (userRepository.findByEmail(email).isPresent()) { 
-			return new ResponseEntity<String>("Fail -> Email is already exist!",
-				  HttpStatus.BAD_REQUEST); 
-		}
 		
 		RestTemplate restTemplate = new RestTemplate();
 		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/files/issued";
@@ -95,18 +70,17 @@ public class DigilockerAPIs {
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
 
 		String result = restTemplate.exchange(URL, HttpMethod.GET, entity, String.class).getBody();
-		System.out.println("result =" + result);
 		JSONObject resObject = new JSONObject(result);
 		JSONArray items = resObject.getJSONArray("items");
 		String uri = "";
 		for (int i = 0; i < items.length(); i++) {
 			uri = (String) new JSONObject(items.get(i).toString()).get("uri");
 		}
-		getPdfFile(uri, tok, udid, mobileNo, email, password);
-		return new ResponseEntity<String>("User Created", HttpStatus.OK);
+		return getPdfFile(uri, tok, udid, mobileNo, email, password);
 	}
 
-	private void getPdfFile(String uri, String tok, BigDecimal udid, BigDecimal mobileNo, String email, String password) {
+	private ResponseEntity<DigiSevaResponseEntity> getPdfFile(String uri, String tok, Long udid, Long mobileNo, String email,
+			String password) {
 		RestTemplate restTemplate = new RestTemplate();
 		String URL = "https://developers.digitallocker.gov.in/public/oauth2/1/file/" + uri;
 		HttpHeaders headers = new HttpHeaders();
@@ -115,32 +89,13 @@ public class DigilockerAPIs {
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
 		byte[] response = restTemplate.exchange(URL, HttpMethod.GET, entity, byte[].class).getBody();
 		try {
-			Utilities.writePdfFile(response);
-			String jsonObjetct = Utilities.xmlToJson(UserJson.class);
+			Utilities.writePdfFile(udid,response);
+			String jsonObjetct = Utilities.xmlToJson(UserJson.class,udid);
 			UserJson user = (UserJson) Utilities.jsonToObject(jsonObjetct, UserJson.class);
-		
-			Set<Role> roles = new HashSet<>();
-			Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-					.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-			roles.add(userRole);
-			
-			Users saveUser = new Users(udid, user.getName(), email,
-					mobileNo, user.getGender(),
-					new SimpleDateFormat("dd-MM-yyyy").parse(user.getDateOfBirth()), password,  roles);
-			Address addr = new Address();
-			addr.setHouseNo(user.getBuilding());
-			addr.setAddress1(user.getStreet());
-			addr.setAddress2(user.getLocality());
-			addr.setCity(user.getVtcName());
-			addr.setPincode(Integer.parseInt(user.getPincode()));
-			addr.setState(user.getStateName());
-			
-			Users u = userRepository.save(saveUser);
-			addr.setUser(u);
-			addressRepo.save(addr);
-			
+			return userService.createNewUser(user,udid,email,mobileNo,password);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
+			return Utilities.createResponse(true, "User Not Created, Please try again", HttpStatus.CONFLICT, ""); 
 		}
 	}
 
@@ -156,7 +111,7 @@ public class DigilockerAPIs {
 		MediaType mediaType = new MediaType("text", "html", utf8);
 		headers.setContentType(mediaType);
 		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-		HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+		HttpMessageConverter<?> stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
 		List<HttpMessageConverter<?>> httpMessageConverter = Lists.newArrayList();
 		httpMessageConverter.add(stringHttpMessageConverter);
 		restTemplate.setMessageConverters(httpMessageConverter);

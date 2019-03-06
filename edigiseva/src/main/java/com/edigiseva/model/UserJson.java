@@ -1,12 +1,18 @@
 package com.edigiseva.model;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
+import com.edigiseva.utils.Gender;
+
 public class UserJson {
 	
 	private String building;
 	private String careOf;
 	private String dateOfBirth;
 	private String districtName;
-	private String gender;
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
 	private String landmark;
 	private String locality;
 	private String name;
@@ -39,10 +45,10 @@ public class UserJson {
 	public void setDistrictName(String districtName) {
 		this.districtName = districtName;
 	}
-	public String getGender() {
+	public Gender getGender() {
 		return gender;
 	}
-	public void setGender(String gender) {
+	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
 	public String getLandmark() {
