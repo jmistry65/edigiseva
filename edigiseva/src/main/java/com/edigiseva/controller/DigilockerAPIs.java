@@ -1,7 +1,6 @@
 package com.edigiseva.controller;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -31,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.edigiseva.message.response.DigiSevaResponseEntity;
+import com.edigiseva.message.request.DigiSevaResponseEntity;
 import com.edigiseva.model.UserJson;
 import com.edigiseva.service.UserService;
 import com.edigiseva.utils.Utilities;
@@ -93,7 +92,7 @@ public class DigilockerAPIs {
 			String jsonObjetct = Utilities.xmlToJson(UserJson.class,udid);
 			UserJson user = (UserJson) Utilities.jsonToObject(jsonObjetct, UserJson.class);
 			return userService.createNewUser(user,udid,email,mobileNo,password);
-		} catch (IOException | ParseException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			return Utilities.createResponse(true, "User Not Created, Please try again", HttpStatus.CONFLICT, ""); 
 		}

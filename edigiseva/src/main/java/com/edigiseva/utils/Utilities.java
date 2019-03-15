@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
@@ -59,7 +58,7 @@ import org.springframework.http.ResponseEntity;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import com.edigiseva.message.response.DigiSevaResponseEntity;
+import com.edigiseva.message.request.DigiSevaResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.zxing.BinaryBitmap;

@@ -14,14 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.edigiseva.message.request.BankRequest;
-import com.edigiseva.message.response.DigiSevaResponseEntity;
+import com.edigiseva.message.request.DigiSevaResponseEntity;
 import com.edigiseva.model.Bank;
 import com.edigiseva.model.Users;
 import com.edigiseva.service.BankService;
 import com.edigiseva.service.UserService;
 import com.edigiseva.utils.Utilities;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

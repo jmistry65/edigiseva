@@ -3,7 +3,7 @@ package com.edigiseva.model;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import com.edigiseva.utils.Gender;
+import com.edigiseva.Enums.Gender;
 
 public class UserJson {
 	

@@ -21,7 +21,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.edigiseva.utils.Gender;
+import com.edigiseva.Enums.Gender;
+
 
 @Entity
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })

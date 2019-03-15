@@ -62,6 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/auth/wallet/**").permitAll()
                 .antMatchers("/api/auth/bank/**").permitAll()
                 .antMatchers("/api/auth/otp/**").permitAll()
+                .antMatchers("/api/auth/instapay/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()

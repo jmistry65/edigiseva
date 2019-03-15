@@ -13,9 +13,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.edigiseva.Enums.Gender;
 import com.edigiseva.model.Address;
 import com.edigiseva.model.Users;
-import com.edigiseva.utils.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserPrinciple implements UserDetails {
