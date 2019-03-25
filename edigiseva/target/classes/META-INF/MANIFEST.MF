@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Implementation-Title: E-Digiseva
 Implementation-Version: 0.0.1
-Built-By: TempUser
+Built-By: Basilroot-10
 Implementation-Vendor-Id: com.edigiseva
-Build-Jdk: 1.8.0_161
+Build-Jdk: 1.8.0_144
 Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
  ot-starter-parent/edigiseva
 Created-By: Maven Integration for Eclipse
